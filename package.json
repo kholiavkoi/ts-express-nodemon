@@ -2,8 +2,8 @@
   "name": "ts-express-nodemon",
   "packageManager": "yarn@3.4.1",
   "scripts": {
-    "dev": "nodemon index.ts",
-    "debug": "nodemon --inspect index.ts"
+    "watch": "tsc -w",
+    "dev": "nodemon --inspect dist/index.js"
   },
   "dependencies": {
     "@types/express": "^4.17.17",
