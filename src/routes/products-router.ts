@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import { productsRepository } from "../repositories/products-repository";
 import { body, validationResult } from "express-validator";
+import { inputValidationMiddleware } from "../middlewares/input-validation-middlware";
 
 export const productsRouter = Router()
 
@@ -9,16 +10,13 @@ const titleValidation = body('title').trim().isLength({
     max: 10
 }).withMessage('Title length should be from 3 to 10 symbols')
 
+
 productsRouter.get('/', (req: Request, res: Response) => {
     const foundProducts = productsRepository.findProducts(req.query.title?.toString())
     res.send(foundProducts)
 })
 
-productsRouter.post('/', titleValidation, (req: Request, res: Response) => {
-    const result = validationResult(req)
-    if (!result.isEmpty()) {
-        return res.send({ errors: result.array() })
-    }
+productsRouter.post('/', titleValidation, inputValidationMiddleware, (req: Request, res: Response) => {
     const newProduct = productsRepository.createProduct(req.body.title)
     res.status(201).send(newProduct)
 })
@@ -32,12 +30,7 @@ productsRouter.get('/:id', (req: Request, res: Response) => {
     }
 })
 
-productsRouter.put('/:id', titleValidation, (req: Request, res: Response) => {
-    const result = validationResult(req)
-    if (!result.isEmpty()) {
-        return res.send({ errors: result.array() })
-    }
-    
+productsRouter.put('/:id', titleValidation, inputValidationMiddleware, (req: Request, res: Response) => {
     const isUpdated = productsRepository.updateProduct(+req.params.id, req.body.title)
     if (isUpdated) {
         const updatedProduct = productsRepository.getProductById(+req.params.id)
